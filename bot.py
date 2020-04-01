@@ -17,14 +17,7 @@ addrole = []
 
 @client.event
 async def on_ready():
-    for guild in client.guilds:
-        print(
-            f'{client.user} is connected to the following guild:\n'
-            f'{guild.name}(id: {guild.id})'
-        )
-        members = '\n - '.join([member.name for member in guild.members])
-        print(f'Guild Members:\n - {members}')
-
+   print("is ready")
 
 @client.event
 async def on_message(message):
@@ -37,6 +30,7 @@ async def on_message(message):
 انصراف ازمدیریت :  nomng
 افزودن بازیکن ها : join
 پایان افزودن بازکن ها : nojoin
+لیست بازیکن های بازی : players
 افزودن نقش ها: addrole role role role role  
 مثال : addrole mafia godfather dr karagah
 دادن نقش ها به بازیکن ها به صورت رندوم : setrole
@@ -130,7 +124,7 @@ async def on_message(message):
                 rnd = random.randint(0, len(setroles)-1)
                 dm = setroles[rnd]
                 del setroles[rnd]
-                players_roles.append(str(dm)[0:str(dm).rfind("#")] + j)
+                players_roles.append(str(dm)[0:str(dm).rfind("#")] + " : " + j)
                 if not dm.dm_channel:
                     await dm.create_dm()
                 await dm.send(j)
@@ -175,7 +169,10 @@ async def on_message(message):
         if removeST:
             try:
                 int(message.content)
+                aut_str = players[int-1]
+                aut_str = aut_str[0:aut_str.rfind("#")]
                 del players[int-1]
+                await chnl.send(aut_str+" از بازی حذف شد ")
                 removeST = False
             except:
                 pass
