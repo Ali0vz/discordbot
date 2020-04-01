@@ -166,6 +166,9 @@ async def on_message(message):
             await chnl.send(f"افرادی که رای داده اند:\n {seprator.join(rms)} ")
             return
         if message.content.lower() == "del":
+            if len(players) == 0 :
+                await chnl.send("بازیکنی وجود ندارد")
+                return
             removeST = True
             rms = []
             num = 1
@@ -182,7 +185,7 @@ async def on_message(message):
                 aut_str = str(players[nt - 1])
                 aut_str = aut_str[0:aut_str.rfind("#")]
                 del players[nt - 1]
-                await chnl.send(aut_str + " از بازی حذف شد ")
+                await chnl.send("بازیکن"+aut_str + " از بازی حذف شد ")
                 removeST = False
             except:
                 await chnl.send(" دستور اشتباه ")
@@ -208,11 +211,10 @@ async def on_message(message):
         return
 
 
-@client.event
-async def on_error(event, *args, **kwargs):
-    print(str(event) + "\n" + str(args))
-    client.run(TOKEN)
-
+# @client.event
+# async def on_error(event, *args, **kwargs):
+#     print(str(event) + "\n" + str(args))
+#     client.run(TOKEN)
 
 client.run(TOKEN)
 
