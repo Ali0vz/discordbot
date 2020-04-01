@@ -47,7 +47,7 @@ async def on_message(message):
 دستور های بازیکن ها :
 اضافه شدن به بازی : !
 رای دادن : پس از شروع رای گیری نام فرد مورد نظر را به همراه ! در اول اسم به ربات دایرکت دهید
-مثال: !Alivz
+مثال: alivz!
 """)
         return
     if message.content.lower() == 'mng' and not gld and message.guild:
@@ -63,8 +63,8 @@ async def on_message(message):
             voters = []
             on_vote = True
             await chnl.send("""شروع رای گیری
-            نام فرد مورد نظر را به همراه ! در اول اسم به ربات دایرکت دهید
-مثال: !Alivz""")
+نام فرد مورد نظر را به همراه ! در اول اسم به ربات دایرکت دهید
+مثال: alivz!""")
             return
         if message.content.lower() == 'novote':
             on_vote = False
@@ -195,7 +195,7 @@ async def on_message(message):
     if join and message.content.lower() == "!":
         players.append(message.author)
         return
-    if on_vote and (message.author in players or len(players) == 0) and not (message.author in voters) and message.content.find("!") == 0:
+    if on_vote and (message.author in players or len(players) == 0) and message.channel != chnl and not (message.author in voters) and message.content.find("!") == 0:
         voters.append(message.author)
         aut_str = str(message.author)
         voteList.append(f'{aut_str[0:aut_str.rfind("#")]} : {str(message.content)[1:]}')
