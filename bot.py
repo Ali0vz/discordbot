@@ -179,7 +179,7 @@ async def on_message(message):
         if removeST:
             try:
                 nt = int(message.content)
-                aut_str = players[nt - 1]
+                aut_str = str(players[nt - 1])
                 aut_str = aut_str[0:aut_str.rfind("#")]
                 del players[nt - 1]
                 await chnl.send(aut_str + " از بازی حذف شد ")
