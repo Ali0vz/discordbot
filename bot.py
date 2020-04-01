@@ -43,7 +43,6 @@ async def on_message(message):
 افرادی که رای نداده اند : novoters
 حذف بازیکن : del
 پایان بازی : endgame
-
 دستور های بازیکن ها :
 اضافه شدن به بازی : !
 رای دادن : پس از شروع رای گیری نام فرد مورد نظر را به همراه ! در اول اسم به ربات دایرکت دهید
@@ -131,16 +130,24 @@ async def on_message(message):
                     rnd = random.randint(0, len(setroles) - 1)
                     dm = setroles[rnd]
                     del setroles[rnd]
-                    players_roles.append(str(dm)[0:str(dm).rfind("#")] + " : " + j)
-                    if not dm.dm_channel:
-                        await dm.create_dm()
-                    await dm.send(j)
+                    try:
+                        players_roles.append(str(dm)[0:str(dm).rfind("#")] + " : " + j)
+                        if not dm.dm_channel:
+                            await dm.create_dm()
+                        await dm.send(j)
+                    except:
+                        chnl.send("خطا در فرستادن نقش برای : "+str(dm))
+                        return
                 dm = manager
                 seprator = "\n"
-                if not dm.dm_channel:
-                    await dm.create_dm()
-                await dm.send(seprator.join(players_roles))
-                return
+                try:
+                    if not dm.dm_channel:
+                        await dm.create_dm()
+                    await dm.send(seprator.join(players_roles))
+                except:
+                    chnl.send("خطا در فرستادن نقش برای : " + str(dm))
+                finally:
+                    return
             else:
                 await chnl.send("تعداد نقش ها از تعداد بازیکن ها بیشتر است")
                 return
@@ -192,8 +199,9 @@ async def on_message(message):
                 removeST = False
             finally:
                 return
-    if join and message.content.lower() == "!":
-        players.append(message.author)
+    if join and message.content.lower() and message.channel == chnl == "!":
+        if message.author not in players:
+            players.append(message.author)
         return
     if on_vote and (message.author in players or len(players) == 0) and message.channel != chnl and not (message.author in voters) and message.content.find("!") == 0:
         voters.append(message.author)
