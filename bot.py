@@ -199,7 +199,7 @@ async def on_message(message):
                 removeST = False
             finally:
                 return
-    if join and message.content.lower() and message.channel == chnl == "!":
+    if join and message.content.lower() == "!" and message.channel == chnl :
         if message.author not in players:
             players.append(message.author)
         return
