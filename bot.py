@@ -1,5 +1,6 @@
 import discord
 import random
+
 TOKEN = "Njk0MTc5NDUwNzY5ODk5NjAw.XoTA_A.IdHdfbQpGVMtp7mXxn-MtJOtjqU"
 client = discord.Client()
 
@@ -17,7 +18,8 @@ addrole = []
 
 @client.event
 async def on_ready():
-   print("is ready")
+    print("is ready")
+
 
 @client.event
 async def on_message(message):
@@ -44,21 +46,25 @@ async def on_message(message):
 
 دستور های بازیکن ها :
 اضافه شدن به بازی : !
-رای دادن : پس از شروع رای گیری نام فرد مورد نظر را به ربات دایرکت دهید
+رای دادن : پس از شروع رای گیری نام فرد مورد نظر را به همراه ! در اول اسم به ربات دایرکت دهید
+مثال: !Alivz
 """)
         return
     if message.content.lower() == 'mng' and not gld and message.guild:
         manager = message.author
         gld = message.guild
         chnl = message.channel
-        await message.channel.send(f"مدیر بازی {str(manager)}")
+        st = str(manager)[0:str(manager).rfind("#")]
+        await message.channel.send(f"مدیر بازی: {st}")
         return
     if message.author == manager and message.guild == gld and message.channel == chnl:
         if message.content.lower() == 'vote':
             voteList = []
             voters = []
             on_vote = True
-            await chnl.send("شروع رای گیری")
+            await chnl.send("""شروع رای گیری
+            نام فرد مورد نظر را به همراه ! در اول اسم به ربات دایرکت دهید
+مثال: !Alivz""")
             return
         if message.content.lower() == 'novote':
             on_vote = False
@@ -93,9 +99,9 @@ async def on_message(message):
             return
         if message.content.find("addrole") != -1:
             roles = str(message.content)
-            idx = roles.find("addrole")+1
+            idx = roles.find("addrole") + 1
             roles = roles[idx:]
-            idx = roles.find(" " )
+            idx = roles.find(" ")
             while idx != -1:
                 idx2 = roles.find(" ", idx + 1)
                 if idx2 == -1:
@@ -105,7 +111,7 @@ async def on_message(message):
                 roles = roles[idx2:]
                 idx = roles.find(" ")
             seprator = " - "
-            await chnl.send(f"نقش ها : {seprator.join(addrole)}")
+            await chnl.send(f"نقش ها :\n {seprator.join(addrole)}")
             return
         if message.content.lower() == "players":
             rms = []
@@ -113,27 +119,31 @@ async def on_message(message):
                 aut_str = str(i)
                 rms.append(aut_str[0:aut_str.rfind("#")])
             seprator = "\n"
-            await chnl.send(f"بازیکن ها:{seprator.join(rms)} ")
+            await chnl.send(f"بازیکن ها:\n{seprator.join(rms)} ")
             return
         if message.content.lower() == "setrole":
             setroles = []
             players_roles = []
-            for i in players:
-                setroles.append(i)
-            for j in addrole:
-                rnd = random.randint(0, len(setroles)-1)
-                dm = setroles[rnd]
-                del setroles[rnd]
-                players_roles.append(str(dm)[0:str(dm).rfind("#")] + " : " + j)
+            if len(addrole) <= len(players):
+                for i in players:
+                    setroles.append(i)
+                for j in addrole:
+                    rnd = random.randint(0, len(setroles) - 1)
+                    dm = setroles[rnd]
+                    del setroles[rnd]
+                    players_roles.append(str(dm)[0:str(dm).rfind("#")] + " : " + j)
+                    if not dm.dm_channel:
+                        await dm.create_dm()
+                    await dm.send(j)
+                dm = manager
+                seprator = "\n"
                 if not dm.dm_channel:
                     await dm.create_dm()
-                await dm.send(j)
-            dm = manager
-            seprator = "\n"
-            if not dm.dm_channel:
-                await dm.create_dm()
-            await dm.send(seprator.join(players_roles))
-            return
+                await dm.send(seprator.join(players_roles))
+                return
+            else:
+                await chnl.send("تعداد نقش ها از تعداد بازیکن ها بیشتر است")
+                return
         if message.content.lower() == "showvote":
             seprator = "\n"
             await chnl.send(seprator.join(voteList))
@@ -141,19 +151,19 @@ async def on_message(message):
         if message.content.lower() == "novoters":
             rms = []
             for i in players:
-                if not(i in voters):
+                if not (i in voters):
                     aut_str = str(i)
                     rms.append(aut_str[0:aut_str.rfind("#")])
             seprator = " , "
-            await chnl.send(f"  افرادی که رای نداده اند: {seprator.join(rms)} ")
+            await chnl.send(f"  افرادی که رای نداده اند:\n {seprator.join(rms)} ")
             return
-        if message.content.lower() == "voters" :
+        if message.content.lower() == "voters":
             rms = []
             for i in voters:
                 aut_str = str(i)
                 rms.append(aut_str[0:aut_str.rfind("#")])
             seprator = " , "
-            await chnl.send(f"افرادی که رای داده اند: {seprator.join(rms)} ")
+            await chnl.send(f"افرادی که رای داده اند:\n {seprator.join(rms)} ")
             return
         if message.content.lower() == "del":
             removeST = True
@@ -161,31 +171,32 @@ async def on_message(message):
             num = 1
             for i in players:
                 aut_str = str(i)
-                rms.append(str(num)+". "+aut_str[0:aut_str.rfind("#")])
+                rms.append(str(num) + ". " + aut_str[0:aut_str.rfind("#")])
                 num += 1
                 seprator = " \n "
-            await chnl.send(seprator.join(rms))
+            await chnl.send("عدد بازیکن مورد نظر را بفرستید: \n"+seprator.join(rms))
             return
         if removeST:
             try:
-                int(message.content)
-                aut_str = players[int-1]
+                nt = int(message.content)
+                aut_str = players[nt - 1]
                 aut_str = aut_str[0:aut_str.rfind("#")]
-                del players[int-1]
-                await chnl.send(aut_str+" از بازی حذف شد ")
+                del players[nt - 1]
+                await chnl.send(aut_str + " از بازی حذف شد ")
                 removeST = False
             except:
-                pass
+                await chnl.send(" دستور اشتباه ")
+                removeST = False
             finally:
                 return
     if join and message.content.lower() == "!":
         players.append(message.author)
         return
-    if on_vote and (message.author in players or len(players) == 0) and not(message.author in voters):
+    if on_vote and (message.author in players or len(players) == 0) and not (message.author in voters) and message.content.find("!") == 0:
         voters.append(message.author)
         aut_str = str(message.author)
-        voteList.append(f'{aut_str[0:aut_str.rfind("#")]} : {(str(message.content))}')
-        remainings = len(players)-len(voteList)
+        voteList.append(f'{aut_str[0:aut_str.rfind("#")]} : {str(message.content)[1:]}')
+        remainings = len(players) - len(voteList)
         await chnl.send(f"{len(voteList)} رای")
         if remainings == 0:
             seprator = "\n"
@@ -199,9 +210,9 @@ async def on_message(message):
 
 @client.event
 async def on_error(event, *args, **kwargs):
-    print(str(event)+"\n"+str(args))
+    print(str(event) + "\n" + str(args))
     client.run(TOKEN)
+
 
 client.run(TOKEN)
 
-                        
