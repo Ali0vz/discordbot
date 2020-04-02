@@ -1,7 +1,8 @@
 import discord
 import random
+import os
 
-TOKEN = "Njk0MTc5NDUwNzY5ODk5NjAw.XoTA_A.IdHdfbQpGVMtp7mXxn-MtJOtjqU"
+TOKEN = os.environ["discord_t"]
 client = discord.Client()
 
 manager = None
@@ -36,6 +37,7 @@ async def on_message(message):
 افزودن نقش ها: addrole role role role role  
 مثال : addrole mafia godfather dr karagah
 دادن نقش ها به بازیکن ها به صورت رندوم : setrole
+لیست بازیکن ها با ترتیب رندوم : rnd
 شروع رای گیری : vote
 پایان رای گیری : novote
 نشان دادن آرا : showvote
@@ -96,11 +98,12 @@ async def on_message(message):
             join = False
             await chnl.send(f"تعداد بازیکن ها: {len(players)}")
             return
-        if message.content.find("addrole") != -1:
+        if message.content.lower().find("addrole") == 0:
             roles = str(message.content)
             idx = roles.find("addrole") + 1
             roles = roles[idx:]
             idx = roles.find(" ")
+            addrole.clear()
             while idx != -1:
                 idx2 = roles.find(" ", idx + 1)
                 if idx2 == -1:
@@ -120,6 +123,17 @@ async def on_message(message):
             seprator = "\n"
             await chnl.send(f"بازیکن ها:\n{seprator.join(rms)} ")
             return
+        if message.content.lower() == "rnd":
+            if len(players) > 1 :
+                rnList=[]
+                for i in players:
+                    aut_str = str(i)
+                    aut_str = aut_str[0, aut_str.rfind("#")]
+                    rnList.append(aut_str)
+                random.shuffle(rnList)
+                seprator="\n"
+                await chnl.send("ترتیب رندوم : \n" + seprator.join(rnList))
+                return
         if message.content.lower() == "setrole":
             setroles = []
             players_roles = []
@@ -143,7 +157,7 @@ async def on_message(message):
                 try:
                     if not dm.dm_channel:
                         await dm.create_dm()
-                    await dm.send(seprator.join(players_roles))
+                    await dm.send("نقش ها: \n"+seprator.join(players_roles))
                 except:
                     chnl.send("خطا در فرستادن نقش برای : " + str(dm))
                 finally:
@@ -173,7 +187,7 @@ async def on_message(message):
             await chnl.send(f"افرادی که رای داده اند:\n {seprator.join(rms)} ")
             return
         if message.content.lower() == "del":
-            if len(players) == 0 :
+            if len(players) == 0:
                 await chnl.send("بازیکنی وجود ندارد")
                 return
             removeST = True
@@ -217,12 +231,5 @@ async def on_message(message):
             voteList = []
             voters = []
         return
-
-
-# @client.event
-# async def on_error(event, *args, **kwargs):
-#     print(str(event) + "\n" + str(args))
-#     client.run(TOKEN)
-
+                        
 client.run(TOKEN)
-
