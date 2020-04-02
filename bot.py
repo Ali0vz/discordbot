@@ -133,6 +133,8 @@ async def on_message(message):
                 random.shuffle(rnList)
                 seprator="\n"
                 await chnl.send("ترتیب رندوم : \n" + seprator.join(rnList))
+            else:
+                await chnl.send("تعداد بازیکن ها کم است")
                 return
         if message.content.lower() == "setrole":
             setroles = []
