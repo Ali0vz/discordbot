@@ -51,6 +51,7 @@ async def on_message(message):
 مثال: alivz!
 """)
         return
+
     if message.content.lower() == 'mng' and not gld and message.guild:
         manager = message.author
         gld = message.guild
@@ -58,6 +59,13 @@ async def on_message(message):
         st = str(manager)[0:str(manager).rfind("#")]
         await message.channel.send(f"مدیر بازی: {st}")
         return
+    if (message.author.permissions_in(channel=message.channel).administrator or message.author == manager) and message.guild == gld and message.channel == chnl :
+        if message.content.lower() == 'nomng':
+            await chnl.send("مدیر از مدیریت انصراف داد")
+            manager = None
+            gld = None
+            chnl = None
+            return
     if message.author == manager and message.guild == gld and message.channel == chnl:
         if message.content.lower() == 'vote':
             voteList = []
@@ -83,12 +91,6 @@ async def on_message(message):
             join = False
             removeST = False
             addrole = []
-            return
-        if message.content.lower() == 'nomng':
-            await chnl.send("مدیر از مدیریت انصراف داد")
-            manager = None
-            gld = None
-            chnl = None
             return
         if message.content.lower() == "join":
             join = True
@@ -124,14 +126,14 @@ async def on_message(message):
             await chnl.send(f"بازیکن ها:\n{seprator.join(rms)} ")
             return
         if message.content.lower() == "rnd":
-            if len(players) > 1 :
-                rnList=[]
+            if len(players) > 1:
+                rnList = []
                 for i in players:
                     aut_str = str(i)
-                    aut_str = aut_str[0, aut_str.rfind("#")]
+                    aut_str = aut_str[0: aut_str.rfind("#")]
                     rnList.append(aut_str)
                 random.shuffle(rnList)
-                seprator="\n"
+                seprator = "\n"
                 await chnl.send("ترتیب رندوم : \n" + seprator.join(rnList))
             else:
                 await chnl.send("تعداد بازیکن ها کم است")
@@ -152,14 +154,14 @@ async def on_message(message):
                             await dm.create_dm()
                         await dm.send(j)
                     except:
-                        chnl.send("خطا در فرستادن نقش برای : "+str(dm))
+                        chnl.send("خطا در فرستادن نقش برای : " + str(dm))
                         return
                 dm = manager
                 seprator = "\n"
                 try:
                     if not dm.dm_channel:
                         await dm.create_dm()
-                    await dm.send("نقش ها: \n"+seprator.join(players_roles))
+                    await dm.send("نقش ها: \n" + seprator.join(players_roles))
                 except:
                     chnl.send("خطا در فرستادن نقش برای : " + str(dm))
                 finally:
@@ -200,7 +202,7 @@ async def on_message(message):
                 rms.append(str(num) + ". " + aut_str[0:aut_str.rfind("#")])
                 num += 1
                 seprator = " \n "
-            await chnl.send("عدد بازیکن مورد نظر را بفرستید: \n"+seprator.join(rms))
+            await chnl.send("عدد بازیکن مورد نظر را بفرستید: \n" + seprator.join(rms))
             return
         if removeST:
             try:
@@ -208,21 +210,25 @@ async def on_message(message):
                 aut_str = str(players[nt - 1])
                 aut_str = aut_str[0:aut_str.rfind("#")]
                 del players[nt - 1]
-                await chnl.send("بازیکن"+aut_str + " از بازی حذف شد ")
+                await chnl.send("بازیکن" + aut_str + " از بازی حذف شد ")
                 removeST = False
             except:
                 await chnl.send(" دستور اشتباه ")
                 removeST = False
             finally:
                 return
-    if join and message.content.lower() == "!" and message.channel == chnl :
+    if join and message.content.lower() == "!" and message.channel == chnl:
         if message.author not in players:
             players.append(message.author)
         return
-    if on_vote and (message.author in players or len(players) == 0) and message.channel != chnl and not (message.author in voters) and message.content.find("!") == 0:
+    if on_vote and (message.author in players or len(players) == 0) and message.channel != chnl and not (
+            message.author in voters) and message.content.find("!") == 0:
+        pers_vote = str(message.content)[1:]
+        if pers_vote.replace(" ", "") == "":
+            return
         voters.append(message.author)
         aut_str = str(message.author)
-        voteList.append(f'{aut_str[0:aut_str.rfind("#")]} : {str(message.content)[1:]}')
+        voteList.append(f'{aut_str[0:aut_str.rfind("#")]} : {pers_vote}')
         remainings = len(players) - len(voteList)
         await chnl.send(f"{len(voteList)} رای")
         if remainings == 0:
@@ -233,5 +239,6 @@ async def on_message(message):
             voteList = []
             voters = []
         return
-                        
+
+
 client.run(TOKEN)
