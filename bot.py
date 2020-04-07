@@ -15,7 +15,7 @@ voteList = []
 voters = []
 players = []
 addrole = []
-
+players_roles = []
 
 @client.event
 async def on_ready():
@@ -26,9 +26,11 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    global voters, chnl, gld, manager, on_vote, join, players, removeST, addrole, voteList
+    global voters, chnl, gld, manager, on_vote, join, players, removeST, addrole, voteList,players_roles
     if message.content.lower() == "help":
-        await  message.channel.send("""کسی که این دستور را بزند مدیر بازی میشود   : mng
+        await  message.channel.send("""ربات بازی مافیا، این ربات جانشین مدیر بازی نمیشود و صرفا با دستور های زیر به ایجاد بازی ای بهتر در دیسکورد کمک میکند
+سازنده : علی وزیری
+کسی که این دستور را بزند مدیر بازی میشود   : mng
 دستور های مدیر:
 انصراف ازمدیریت :  nomng
 افزودن بازیکن ها : join
@@ -48,7 +50,7 @@ async def on_message(message):
 دستور های بازیکن ها :
 اضافه شدن به بازی : !
 رای دادن : پس از شروع رای گیری نام فرد مورد نظر را به همراه ! در اول اسم به ربات دایرکت دهید
-مثال: alivz!
+مثال: ahmad!
 """)
         return
 
@@ -80,11 +82,13 @@ async def on_message(message):
             await chnl.send("پایان رای گیری")
             return
         if message.content.lower() == "endgame":
-            await chnl.send("اتمام بازی")
+            sep = "\n"
+            await chnl.send("اتمام بازی" + " \n نقش ها : \n" + sep.join(players_roles))
             on_vote = False
             voteList = []
             voters = []
             manager = None
+            players_roles = []
             gld = None
             chnl = None
             players = []
@@ -140,7 +144,6 @@ async def on_message(message):
                 return
         if message.content.lower() == "setrole":
             setroles = []
-            players_roles = []
             if len(addrole) <= len(players):
                 for i in players:
                     setroles.append(i)
@@ -156,6 +159,18 @@ async def on_message(message):
                     except:
                         chnl.send("خطا در فرستادن نقش برای : " + str(dm))
                         return
+
+                for j in setroles:
+                    dm = j
+                    try:
+                        players_roles.append(str(dm)[0:str(dm).rfind("#")] + " : " + "Shahrvand")
+                        if not dm.dm_channel:
+                            await dm.create_dm()
+                        await dm.send("Shahrvand")
+                    except:
+                        chnl.send("خطا در فرستادن نقش برای : " + str(dm))
+                        return
+
                 dm = manager
                 seprator = "\n"
                 try:
